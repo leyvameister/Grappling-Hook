@@ -21,6 +21,8 @@ public class HookSettings {
     private boolean lineBreak;
     private boolean stickyHook;
     private int customModelData;
+    private boolean pullPlayers;
+    private boolean pullSelf;
 
     private ItemStack hookItem;
 
@@ -28,15 +30,17 @@ public class HookSettings {
     private HashMap<Material, Boolean> materials = new HashMap<>();
 
     public HookSettings(String id,
-        int maxUses,
-        double velocityThrow,
-        double velocityPull,
-        int timeBetweenGrapples,
-        boolean fallDamage,
-        boolean slowFall,
-        boolean lineBreak,
-        boolean stickyHook,
-        int customModelData){
+                        int maxUses,
+                        double velocityThrow,
+                        double velocityPull,
+                        int timeBetweenGrapples,
+                        boolean fallDamage,
+                        boolean slowFall,
+                        boolean lineBreak,
+                        boolean stickyHook,
+                        int customModelData,
+                        boolean pullPlayers,
+                        boolean pullSelf) {
 
         this.id = id;
         this.maxUses = maxUses;
@@ -48,39 +52,39 @@ public class HookSettings {
         this.lineBreak = lineBreak;
         this.stickyHook = stickyHook;
         this.customModelData = customModelData;
+        this.pullPlayers = pullPlayers;
+        this.pullSelf = pullSelf;
     }
 
-    public void setEntityList(boolean isBlackList, List<EntityType> entityTypeList){
-        if(isBlackList){
+    public void setEntityList(boolean isBlackList, List<EntityType> entityTypeList) {
+        if (isBlackList) {
             List<EntityType> entities = new ArrayList(Arrays.asList(EntityType.values()));
-            for(EntityType entityType : entityTypeList){
+            for (EntityType entityType : entityTypeList) {
                 entities.remove(entityType);
             }
 
-            for(EntityType entityType : entities){
+            for (EntityType entityType : entities) {
                 this.entityTypes.put(entityType, true);
             }
-        }
-        else{
-            for(EntityType entityType : entityTypeList){
+        } else {
+            for (EntityType entityType : entityTypeList) {
                 this.entityTypes.put(entityType, true);
             }
         }
     }
 
-    public void setMaterialList(boolean isBlackList, List<Material> materialList){
-        if(isBlackList){
+    public void setMaterialList(boolean isBlackList, List<Material> materialList) {
+        if (isBlackList) {
             List<Material> materials = new ArrayList(Arrays.asList(Material.values()));
-            for(Material material : materialList){
+            for (Material material : materialList) {
                 materials.remove(material);
             }
 
-            for(Material material : materials){
+            for (Material material : materials) {
                 this.materials.put(material, true);
             }
-        }
-        else{
-            for(Material material : materialList){
+        } else {
+            for (Material material : materialList) {
                 this.materials.put(material, true);
             }
         }
@@ -98,7 +102,7 @@ public class HookSettings {
         return id;
     }
 
-    public int getMaxUses(){
+    public int getMaxUses() {
         return maxUses;
     }
 
@@ -134,11 +138,19 @@ public class HookSettings {
         return customModelData;
     }
 
-    public boolean canHookEntityType(EntityType entityType){
+    public boolean canHookEntityType(EntityType entityType) {
         return entityTypes.containsKey(entityType);
     }
 
-    public boolean canHookMaterial(Material material){
+    public boolean canHookMaterial(Material material) {
         return materials.containsKey(material);
+    }
+
+    public boolean canPullPlayers() {
+        return pullPlayers;
+    }
+
+    public boolean canPullSelf() {
+        return pullSelf;
     }
 }

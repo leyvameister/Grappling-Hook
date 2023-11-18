@@ -57,8 +57,10 @@ public class RecipeLoader {
                 boolean lineBreak = config.getBoolean("recipes." + recipeNumber + ".lineBreak");
                 boolean stickyHook = config.getBoolean("recipes." + recipeNumber + ".stickyHook");
                 int customModelData = config.getInt("recipes." + recipeNumber + ".customModelData", 0);
+                boolean pullPlayers = config.getBoolean("recipes." + recipeNumber + ".pullPlayers");
+                boolean pullSelf = config.getBoolean("recipes." + recipeNumber + ".pullSelf");
 
-                HookSettings hookSettings = new HookSettings(id, uses, velocityThrow, velocityPull, timeBetweenGrapples, fallDamage, slowFall, lineBreak, stickyHook, customModelData);
+                HookSettings hookSettings = new HookSettings(id, uses, velocityThrow, velocityPull, timeBetweenGrapples, fallDamage, slowFall, lineBreak, stickyHook, customModelData, pullPlayers, pullSelf);
 
                 try {
                     boolean isBlackList = false;
