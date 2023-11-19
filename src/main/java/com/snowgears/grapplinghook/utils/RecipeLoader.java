@@ -3,7 +3,9 @@ package com.snowgears.grapplinghook.utils;
 import com.snowgears.grapplinghook.GrapplingHook;
 import org.bukkit.*;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
@@ -20,7 +22,7 @@ public class RecipeLoader {
     private GrapplingHook plugin;
     private File recipesFile;
 
-    public RecipeLoader(GrapplingHook plugin){
+    public RecipeLoader(GrapplingHook plugin) {
         this.plugin = plugin;
         this.recipesFile = new File(plugin.getDataFolder(), "recipes.yml");
 
@@ -59,8 +61,9 @@ public class RecipeLoader {
                 int customModelData = config.getInt("recipes." + recipeNumber + ".customModelData", 0);
                 boolean pullPlayers = config.getBoolean("recipes." + recipeNumber + ".pullPlayers");
                 boolean pullSelf = config.getBoolean("recipes." + recipeNumber + ".pullSelf");
+                boolean glows = config.getBoolean("recipes." + recipeNumber + ".glows");
 
-                HookSettings hookSettings = new HookSettings(id, uses, velocityThrow, velocityPull, timeBetweenGrapples, fallDamage, slowFall, lineBreak, stickyHook, customModelData, pullPlayers, pullSelf);
+                HookSettings hookSettings = new HookSettings(id, uses, velocityThrow, velocityPull, timeBetweenGrapples, fallDamage, slowFall, lineBreak, stickyHook, customModelData, pullPlayers, pullSelf, glows);
 
                 try {
                     boolean isBlackList = false;
@@ -68,19 +71,19 @@ public class RecipeLoader {
                     List<String> entityTypeStrings = config.getStringList("recipes." + recipeNumber + ".entity.list");
 
                     List<EntityType> entityTypeList = new ArrayList<>();
-                    for(String entityTypeString : entityTypeStrings){
+                    for (String entityTypeString : entityTypeStrings) {
                         try {
-                            if(!entityTypeString.isEmpty())
+                            if (!entityTypeString.isEmpty())
                                 entityTypeList.add(EntityType.valueOf(entityTypeString));
-                        } catch (IllegalArgumentException e){
-                            plugin.getLogger().log(Level.WARNING, "unrecognized entity type in recipe "+recipeNumber+": "+entityTypeString);
+                        } catch (IllegalArgumentException e) {
+                            plugin.getLogger().log(Level.WARNING, "unrecognized entity type in recipe " + recipeNumber + ": " + entityTypeString);
                         }
                     }
 
-                    if(blackListString.equalsIgnoreCase("blacklist"))
+                    if (blackListString.equalsIgnoreCase("blacklist"))
                         isBlackList = true;
                     hookSettings.setEntityList(isBlackList, entityTypeList);
-                } catch (NullPointerException e){
+                } catch (NullPointerException e) {
                     hookSettings.setEntityList(true, new ArrayList<>());
                 }
 
@@ -90,41 +93,49 @@ public class RecipeLoader {
                     List<String> materialStrings = config.getStringList("recipes." + recipeNumber + ".material.list");
 
                     List<Material> materialList = new ArrayList<>();
-                    for(String materialString : materialStrings){
+                    for (String materialString : materialStrings) {
                         try {
-                            if(!materialString.isEmpty())
+                            if (!materialString.isEmpty())
                                 materialList.add(Material.valueOf(materialString));
-                        } catch (IllegalArgumentException e){
-                            plugin.getLogger().log(Level.WARNING, "unrecognized material in recipe "+recipeNumber+": "+materialString);
+                        } catch (IllegalArgumentException e) {
+                            plugin.getLogger().log(Level.WARNING, "unrecognized material in recipe " + recipeNumber + ": " + materialString);
                         }
                     }
 
-                    if(blackListString.equalsIgnoreCase("blacklist"))
+                    if (blackListString.equalsIgnoreCase("blacklist"))
                         isBlackList = true;
                     hookSettings.setMaterialList(isBlackList, materialList);
-                } catch (NullPointerException e){
+                } catch (NullPointerException e) {
                     hookSettings.setMaterialList(true, new ArrayList<>());
                 }
 
                 ItemStack hookItem = new ItemStack(Material.FISHING_ROD);
                 ItemMeta hookItemMeta = hookItem.getItemMeta();
                 hookItemMeta.setDisplayName(formatString(name, uses));
-                if(lore != null && !lore.isEmpty()) {
+                if (lore != null && !lore.isEmpty()) {
                     List<String> loreList = new ArrayList<>();
-                    for(String loreString : lore) {
+                    for (String loreString : lore) {
                         loreList.add(formatString(loreString, uses));
                     }
                     hookItemMeta.setLore(loreList);
                 }
 
-                if(customModelData != 0)
+                if (customModelData != 0)
                     hookItemMeta.setCustomModelData(Integer.valueOf(customModelData));
 
                 PersistentDataContainer persistentData = hookItemMeta.getPersistentDataContainer();
                 persistentData.set(new NamespacedKey(plugin, "uses"), PersistentDataType.INTEGER, uses);
                 persistentData.set(new NamespacedKey(plugin, "id"), PersistentDataType.STRING, id);
 
+                if (hookSettings.glows()) {
+
+                    hookItemMeta.addEnchant(Enchantment.OXYGEN, 1, true);
+                    hookItemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+
+                }
+
                 hookItem.setItemMeta(hookItemMeta);
+
 
                 hookSettings.setHookItem(hookItem);
                 //register the hook setting in map
@@ -163,55 +174,51 @@ public class RecipeLoader {
                     threeLettersArray[i] = threeLetters;
                 }
 
-                if(threeLettersArray[0].startsWith("_") && threeLettersArray[1].startsWith("_") && threeLettersArray[2].startsWith("_")){
+                if (threeLettersArray[0].startsWith("_") && threeLettersArray[1].startsWith("_") && threeLettersArray[2].startsWith("_")) {
                     threeLettersArray[0] = threeLettersArray[0].substring(1);
                     threeLettersArray[1] = threeLettersArray[1].substring(1);
                     threeLettersArray[2] = threeLettersArray[2].substring(1);
                 }
-                if(threeLettersArray[0].endsWith("_") && threeLettersArray[1].endsWith("_") && threeLettersArray[2].endsWith("_")){
-                    threeLettersArray[0] = threeLettersArray[0].substring(0, threeLettersArray[0].length()-1);
-                    threeLettersArray[1] = threeLettersArray[0].substring(0, threeLettersArray[1].length()-1);
-                    threeLettersArray[2] = threeLettersArray[0].substring(0, threeLettersArray[2].length()-1);
+                if (threeLettersArray[0].endsWith("_") && threeLettersArray[1].endsWith("_") && threeLettersArray[2].endsWith("_")) {
+                    threeLettersArray[0] = threeLettersArray[0].substring(0, threeLettersArray[0].length() - 1);
+                    threeLettersArray[1] = threeLettersArray[0].substring(0, threeLettersArray[1].length() - 1);
+                    threeLettersArray[2] = threeLettersArray[0].substring(0, threeLettersArray[2].length() - 1);
                 }
 
 
-
-                if(onlyContainsUnderscores(threeLettersArray[0])){
+                if (onlyContainsUnderscores(threeLettersArray[0])) {
                     recipe.shape(threeLettersArray[1], threeLettersArray[2]);
-                    if(threeLettersArray[1].contains("_") || threeLettersArray[2].contains("_")) {
+                    if (threeLettersArray[1].contains("_") || threeLettersArray[2].contains("_")) {
                         materialMap.put("_", Material.AIR);
                     }
-                }
-                else if(onlyContainsUnderscores(threeLettersArray[2])){
+                } else if (onlyContainsUnderscores(threeLettersArray[2])) {
                     recipe.shape(threeLettersArray[0], threeLettersArray[1]);
-                    if(threeLettersArray[0].contains("_") || threeLettersArray[1].contains("_")) {
+                    if (threeLettersArray[0].contains("_") || threeLettersArray[1].contains("_")) {
                         materialMap.put("_", Material.AIR);
                     }
-                }
-                else {
+                } else {
                     try {
                         recipe.shape(threeLettersArray[0], threeLettersArray[1], threeLettersArray[2]);
 
-                        if(threeLettersArray[0].contains("_") || (threeLettersArray[1].contains("_") || threeLettersArray[2].contains("_"))) {
+                        if (threeLettersArray[0].contains("_") || (threeLettersArray[1].contains("_") || threeLettersArray[2].contains("_"))) {
                             materialMap.put("_", Material.AIR);
                         }
 
-                    } catch (IllegalArgumentException e){
-                        plugin.getLogger().log(Level.WARNING, "Problem with shaping recipe "+recipeNumber);
+                    } catch (IllegalArgumentException e) {
+                        plugin.getLogger().log(Level.WARNING, "Problem with shaping recipe " + recipeNumber);
                     }
                 }
                 //System.out.println(threeLettersArray[0] + ", "+ threeLettersArray[1] + ", "+threeLettersArray[2]);
                 //recipe.shape("1 1")
 
                 for (Map.Entry<String, Material> entry : materialMap.entrySet()) {
-                    if(entry.getValue().toString().contains("_PLANKS")){
+                    if (entry.getValue().toString().contains("_PLANKS")) {
                         recipe.setIngredient(entry.getKey().charAt(0), new RecipeChoice.MaterialChoice(Tag.PLANKS));
-                    }
-                    else {
+                    } else {
                         try {
                             recipe.setIngredient(entry.getKey().charAt(0), entry.getValue());
-                        } catch (IllegalArgumentException e){
-                            plugin.getLogger().log(Level.WARNING, "Problem with setting ingredient in recipe "+recipeNumber);
+                        } catch (IllegalArgumentException e) {
+                            plugin.getLogger().log(Level.WARNING, "Problem with setting ingredient in recipe " + recipeNumber);
                         }
                     }
                 }
@@ -220,29 +227,29 @@ public class RecipeLoader {
             }
         }
 
-        plugin.getLogger().log(Level.INFO, "Loaded "+loadedCount+" recipes.");
+        plugin.getLogger().log(Level.INFO, "Loaded " + loadedCount + " recipes.");
     }
 
-    private boolean onlyContainsUnderscores(String s){
-        for (int i =0; i< s.length(); i++){
+    private boolean onlyContainsUnderscores(String s) {
+        for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
-            if(c != '_'){
+            if (c != '_') {
                 return false;
             }
         }
         return true;
     }
 
-    public void unloadRecipes(){
+    public void unloadRecipes() {
         NamespacedKey key;
-        for(String hookID : plugin.getGrapplingListener().getHookIDs()){
+        for (String hookID : plugin.getGrapplingListener().getHookIDs()) {
             key = new NamespacedKey(plugin, "hook_item_" + hookID);
             Bukkit.removeRecipe(key);
         }
     }
 
-    private String formatString(String unformattedString, int uses){
-        unformattedString = unformattedString.replace("[uses]", ""+uses);
+    private String formatString(String unformattedString, int uses) {
+        unformattedString = unformattedString.replace("[uses]", "" + uses);
         unformattedString = ChatColor.translateAlternateColorCodes('&', unformattedString);
         return unformattedString;
     }

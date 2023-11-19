@@ -33,6 +33,7 @@ recipes:
     name: '&6Wood Grappling Hook'
     lore:
       - '&7Uses left - &a[uses]'
+    glows: true
     customModelData: 0
     uses: 5
     velocityThrow: 1.0

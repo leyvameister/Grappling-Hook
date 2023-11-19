@@ -23,6 +23,7 @@ public class HookSettings {
     private int customModelData;
     private boolean pullPlayers;
     private boolean pullSelf;
+    private boolean glows;
 
     private ItemStack hookItem;
 
@@ -40,7 +41,8 @@ public class HookSettings {
                         boolean stickyHook,
                         int customModelData,
                         boolean pullPlayers,
-                        boolean pullSelf) {
+                        boolean pullSelf,
+                        boolean glows) {
 
         this.id = id;
         this.maxUses = maxUses;
@@ -54,6 +56,7 @@ public class HookSettings {
         this.customModelData = customModelData;
         this.pullPlayers = pullPlayers;
         this.pullSelf = pullSelf;
+        this.glows = glows;
     }
 
     public void setEntityList(boolean isBlackList, List<EntityType> entityTypeList) {
@@ -152,5 +155,9 @@ public class HookSettings {
 
     public boolean canPullSelf() {
         return pullSelf;
+    }
+
+    public boolean glows() {
+        return glows;
     }
 }

@@ -142,6 +142,9 @@ public class GrapplingListener implements Listener {
         if (noGrapplePlayers.containsKey(player.getUniqueId())) {
             if ((plugin.usePerms() && !player.hasPermission("grapplinghook.player.nocooldown")) || (!plugin.usePerms() && !player.isOp())) {
                 player.sendMessage(ChatColor.GRAY + "You cannot do that yet.");
+
+                //TODO configurable messages
+
                 return;
             }
         }
@@ -163,6 +166,9 @@ public class GrapplingListener implements Listener {
                     pullEntityToLocation(player, loc, HookAPI.getHookInHandVelocityPull(player));
             }
         } else { //the player is pulling an entity to them
+
+            //TODO give strength
+
             if (plugin.getTeleportHooked()) {
                 e.teleport(loc);
             } else {
