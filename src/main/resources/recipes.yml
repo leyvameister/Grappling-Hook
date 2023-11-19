@@ -45,6 +45,15 @@ recipes:
     stickyHook: true
     pullPlayers: false
     pullSelf: true
+    potEffectsOnPull:
+      1:
+        type: 'INCREASE_DAMAGE'
+        duration: 3
+        amplifier: 2
+      2:
+        type: 'SPEED'
+        duration: 7
+        amplifier: 1
     recipe:
       materials:
         F: 'FISHING_ROD'

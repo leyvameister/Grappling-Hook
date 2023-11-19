@@ -166,8 +166,16 @@ public class GrapplingListener implements Listener {
                     pullEntityToLocation(player, loc, HookAPI.getHookInHandVelocityPull(player));
             }
         } else { //the player is pulling an entity to them
+            HookSettings hookSettingsForHook = HookAPI.getHookSettingsForHook(event.getHookItem());
+            List<PotionEffect> potionEffects = hookSettingsForHook.getPotionEffects();
 
-            //TODO give strength
+            if (!potionEffects.isEmpty()) {
+                for (PotionEffect potionEffect : potionEffects) {
+                    player.addPotionEffect(potionEffect);
+                }
+
+            }
+
 
             if (plugin.getTeleportHooked()) {
                 e.teleport(loc);

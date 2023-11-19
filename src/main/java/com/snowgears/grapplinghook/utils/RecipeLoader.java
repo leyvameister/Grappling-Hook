@@ -2,6 +2,7 @@ package com.snowgears.grapplinghook.utils;
 
 import com.snowgears.grapplinghook.GrapplingHook;
 import org.bukkit.*;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
@@ -12,6 +13,8 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.util.*;
@@ -27,6 +30,33 @@ public class RecipeLoader {
         this.recipesFile = new File(plugin.getDataFolder(), "recipes.yml");
 
         loadRecipes();
+    }
+
+    private static List<PotionEffect> parsePotionEffectsSection(ConfigurationSection potEffectsSection) {
+        List<PotionEffect> potionEffects = new ArrayList<>();
+
+        Set<String> potionEffectIds = potEffectsSection.getKeys(false);
+
+        for (String effectId : potionEffectIds) {
+            ConfigurationSection effectSection = potEffectsSection.getConfigurationSection(effectId);
+
+            if (effectSection != null) {
+                String type = effectSection.getString("type");
+                int duration = effectSection.getInt("duration");
+                int amplifier = effectSection.getInt("amplifier");
+
+                PotionEffectType potionEffectType = PotionEffectType.getByName(type);
+
+                if (potionEffectType != null) {
+                    PotionEffect potionEffect = new PotionEffect(potionEffectType, duration*20, amplifier-1);
+                    potionEffects.add(potionEffect);
+                } else {
+                    System.out.println("Unknown potion type: " + type);
+                }
+            }
+        }
+
+        return potionEffects;
     }
 
     private void loadRecipes() {
@@ -62,8 +92,9 @@ public class RecipeLoader {
                 boolean pullPlayers = config.getBoolean("recipes." + recipeNumber + ".pullPlayers");
                 boolean pullSelf = config.getBoolean("recipes." + recipeNumber + ".pullSelf");
                 boolean glows = config.getBoolean("recipes." + recipeNumber + ".glows");
+                List<PotionEffect> potionEffects = parsePotionEffectsSection(config.getConfigurationSection("recipes." + recipeNumber + ".potEffectsOnPull"));
 
-                HookSettings hookSettings = new HookSettings(id, uses, velocityThrow, velocityPull, timeBetweenGrapples, fallDamage, slowFall, lineBreak, stickyHook, customModelData, pullPlayers, pullSelf, glows);
+                HookSettings hookSettings = new HookSettings(id, uses, velocityThrow, velocityPull, timeBetweenGrapples, fallDamage, slowFall, lineBreak, stickyHook, customModelData, pullPlayers, pullSelf, glows, potionEffects);
 
                 try {
                     boolean isBlackList = false;

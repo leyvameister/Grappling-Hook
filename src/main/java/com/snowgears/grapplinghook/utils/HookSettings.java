@@ -3,6 +3,7 @@ package com.snowgears.grapplinghook.utils;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +30,7 @@ public class HookSettings {
 
     private HashMap<EntityType, Boolean> entityTypes = new HashMap<>();
     private HashMap<Material, Boolean> materials = new HashMap<>();
+    private List<PotionEffect> potionEffects;
 
     public HookSettings(String id,
                         int maxUses,
@@ -42,7 +44,8 @@ public class HookSettings {
                         int customModelData,
                         boolean pullPlayers,
                         boolean pullSelf,
-                        boolean glows) {
+                        boolean glows,
+                        List<PotionEffect> potionEffects) {
 
         this.id = id;
         this.maxUses = maxUses;
@@ -57,6 +60,7 @@ public class HookSettings {
         this.pullPlayers = pullPlayers;
         this.pullSelf = pullSelf;
         this.glows = glows;
+        this.potionEffects = potionEffects;
     }
 
     public void setEntityList(boolean isBlackList, List<EntityType> entityTypeList) {
@@ -159,5 +163,9 @@ public class HookSettings {
 
     public boolean glows() {
         return glows;
+    }
+
+    public List<PotionEffect> getPotionEffects() {
+        return potionEffects;
     }
 }
